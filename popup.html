@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+  <div class="header">
+    <div class="theme-toggle">
+      <label class="theme-switch">
+        <input type="checkbox" id="themeToggle">
+        <span class="slider">
+          <svg class="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path
+              d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0-2a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM13 4h-2v3h2V4zm0 13h-2v3h2v-3zM4 11v2h3v-2H4zm13 0v2h3v-2h-3z" />
+          </svg>
+          <svg class="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446A9 9 0 1 1 12 3z" />
+          </svg>
+        </span>
+      </label>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Copy Mode:</h3>
+    <div class="copy-mode">
+      <button id="copyTicker">Copy Ticker</button>
+      <button id="copyName">Copy Name</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Enable Highlighting:</h3>
+    <div class="toggle-label">
+      <label class="switch">
+        <input type="checkbox" id="highlightToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Auto Paste:</h3>
+    <div class="toggle-label">
+      <label class="switch">
+        <input type="checkbox" id="autoPasteToggle">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Last Copied:</h3>
+    <div id="lastCopied" class="last-copied">None</div>
+  </div>
+
+  <script src="popup.js" defer></script>
+</body>
+
+</html>
