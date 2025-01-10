@@ -1,20 +1,24 @@
 {
-    "manifest_version": 3,
-    "name": "Photon Memescope Tool",
-    "version": "1.0",
-    "description": "Memescope Ticker and Name Copy",
-    "permissions": [
-      "activeTab",
-      "clipboardWrite",
-      "storage"
-    ],
-    "action": {
-      "default_popup": "popup.html"
-    },
-    "content_scripts": [
-      {
-        "matches": ["*://photon-sol.tinyastro.io/*"],
-        "js": ["content.js"]
-      }
-    ]
-  }
+  "manifest_version": 2,
+  "name": "Photon Trench Tool",
+  "version": "1.0",
+  "description": "Memescope Ticker and Name Copy",
+  "permissions": [
+    "activeTab",
+    "clipboardWrite",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://photon-sol.tinyastro.io/*"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ]
+}
