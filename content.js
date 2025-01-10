@@ -165,17 +165,17 @@ function showTooltip(text, x, y) {
     setTimeout(() => tooltip.style.display = 'none', 1000);
 }
 
-// Handle mouse hover with debouncing - FIXED VERSION
+// Handle mouse hover with debouncing
 document.addEventListener('mouseover', debounce(async (e) => {
+    if (!isAutoCopyEnabled) return;  // Early return if auto-copy is OFF
+
     const text = getElementText(e.target);
-    if (text && text !== lastHoveredText) {  // Removed isAutoCopyEnabled check from here
+    if (text && text !== lastHoveredText) {
         lastHoveredText = text;
         try {
-            if (isAutoCopyEnabled) {  // Moved check here
-                await navigator.clipboard.writeText(text);
-                chrome.storage.local.set({ lastCopied: text });
-                showTooltip(text, e.clientX, e.clientY);
-            }
+            await navigator.clipboard.writeText(text);
+            chrome.storage.local.set({ lastCopied: text });
+            showTooltip(text, e.clientX, e.clientY);
 
             if (isAutoPasteEnabled) {
                 if (currentPasteTimeout) {
