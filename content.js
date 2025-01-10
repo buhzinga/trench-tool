@@ -5,6 +5,7 @@ let lastPastedText = '';
 let isSearchBoxFocused = false;
 let isHighlightEnabled = false;
 let isAutoPasteEnabled = true;
+let isAutoCopyEnabled = true;
 let activeSearchInput = null;
 let pasteAttempts = 0;
 let currentPasteTimeout = null;
@@ -35,10 +36,11 @@ function updateHighlightStyles(enabled) {
 }
 
 // Initialize from storage
-chrome.storage.local.get(['copyMode', 'highlightEnabled', 'autoPasteEnabled'], (settings) => {
+chrome.storage.local.get(['copyMode', 'highlightEnabled', 'autoPasteEnabled', 'autoCopyEnabled'], (settings) => {
     currentCopyMode = settings.copyMode || 'ticker';
     isHighlightEnabled = settings.highlightEnabled || false;
     isAutoPasteEnabled = settings.autoPasteEnabled ?? true;
+    isAutoCopyEnabled = settings.autoCopyEnabled ?? true;
     updateHighlightStyles(isHighlightEnabled);
 });
 
@@ -53,6 +55,9 @@ chrome.storage.onChanged.addListener((changes) => {
     }
     if (changes.autoPasteEnabled) {
         isAutoPasteEnabled = changes.autoPasteEnabled.newValue;
+    }
+    if (changes.autoCopyEnabled) {
+        isAutoCopyEnabled = changes.autoCopyEnabled.newValue;
     }
 });
 
@@ -89,13 +94,9 @@ function autoPasteIntoSearch(text) {
     }
 
     if (searchInput) {
-        // Store the text we're attempting to paste
         lastPastedText = text;
-
-        // Set the value
         searchInput.value = text;
 
-        // Create and dispatch events
         const events = [
             new Event('input', { bubbles: true }),
             new Event('change', { bubbles: true }),
@@ -104,12 +105,9 @@ function autoPasteIntoSearch(text) {
         ];
 
         events.forEach(event => searchInput.dispatchEvent(event));
-
-        // Focus the input and move cursor to end
         searchInput.focus();
         searchInput.setSelectionRange(text.length, text.length);
     } else {
-        // If the input isn't found and we're still within our active window, retry
         pasteAttempts++;
         if (pasteAttempts < MAX_PASTE_ATTEMPTS && isPastingActive) {
             setTimeout(() => autoPasteIntoSearch(text), 200);
@@ -119,7 +117,7 @@ function autoPasteIntoSearch(text) {
     }
 }
 
-// Add mutation observer to detect search input
+// Add mutation observer
 const observeSearchInput = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
         if (mutation.addedNodes.length && lastPastedText && isPastingActive) {
@@ -134,7 +132,7 @@ observeSearchInput.observe(document.body, {
     subtree: true
 });
 
-// Create reusable tooltip
+// Create tooltip
 const tooltip = document.createElement('div');
 tooltip.style.cssText = `
     position: fixed;
@@ -149,7 +147,7 @@ tooltip.style.cssText = `
 `;
 document.body.appendChild(tooltip);
 
-// Debounced hover handler
+// Debounce function
 function debounce(func, wait) {
     let timeout;
     return function (...args) {
@@ -167,34 +165,30 @@ function showTooltip(text, x, y) {
     setTimeout(() => tooltip.style.display = 'none', 1000);
 }
 
-// Handle mouse hover with debouncing
+// Handle mouse hover with debouncing - FIXED VERSION
 document.addEventListener('mouseover', debounce(async (e) => {
     const text = getElementText(e.target);
-    if (text && text !== lastHoveredText) {
+    if (text && text !== lastHoveredText) {  // Removed isAutoCopyEnabled check from here
         lastHoveredText = text;
         try {
-            await navigator.clipboard.writeText(text);
-            chrome.storage.local.set({ lastCopied: text });
-            showTooltip(text, e.clientX, e.clientY);
-
-            // Clear any existing timeout
-            if (currentPasteTimeout) {
-                clearTimeout(currentPasteTimeout);
+            if (isAutoCopyEnabled) {  // Moved check here
+                await navigator.clipboard.writeText(text);
+                chrome.storage.local.set({ lastCopied: text });
+                showTooltip(text, e.clientX, e.clientY);
             }
 
-            // Reset paste attempts and activate pasting
-            pasteAttempts = 0;
-            isPastingActive = true;
-
-            // Start auto-pasting
-            autoPasteIntoSearch(text);
-
-            // Set timeout to stop pasting after 5 seconds
-            currentPasteTimeout = setTimeout(() => {
-                isPastingActive = false;
+            if (isAutoPasteEnabled) {
+                if (currentPasteTimeout) {
+                    clearTimeout(currentPasteTimeout);
+                }
                 pasteAttempts = 0;
-            }, 5000); // 5 seconds
-
+                isPastingActive = true;
+                autoPasteIntoSearch(text);
+                currentPasteTimeout = setTimeout(() => {
+                    isPastingActive = false;
+                    pasteAttempts = 0;
+                }, 5000);
+            }
         } catch (err) {
             console.error('Failed to copy text:', err);
         }
