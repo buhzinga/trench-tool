@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Trench Tool",
   "version": "1.0",
-  "description": "Photon Memescope Ticker/Name Copy",
+  "description": "Memescope Ticker/Name Copy",
   "permissions": [
     "activeTab",
     "clipboardWrite",
