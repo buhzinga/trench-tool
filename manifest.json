@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Photon Trench Tool",
+  "name": "Trench Tool",
   "version": "1.0",
-  "description": "Memescope Ticker and Name Copy",
+  "description": "Photon Memescope Ticker/Name Copy",
   "permissions": [
     "activeTab",
     "clipboardWrite",
