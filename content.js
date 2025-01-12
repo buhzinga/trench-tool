@@ -12,27 +12,37 @@ let currentPasteTimeout = null;
 let isPastingActive = false;
 const MAX_PASTE_ATTEMPTS = 5;
 
-// Cache class names
-const PARENT_CLASS = 'WVGVwZc0h0OScZ9YAaqM';
-const TICKER_CLASS = 'siDxb5Gcy0nyxGjDtRQj';
-const NAME_CLASS = 'fsYi35goS5HvMls5HBGU';
+// Update CLASSES constant (keep existing classes)
+const CLASSES = {
+    NAME: 'fsYi35goS5HvMls5HBGU',
+    PARENT: 'U3jLlAVrk5kIsp1eeF9L',
+    TICKER: 'siDxb5Gcy0nyxGjDtRQj',
+};
 
 // Create style element
 const style = document.createElement('style');
 document.head.appendChild(style);
 
-// Function to update highlight styles
+// Update highlight styles function
 function updateHighlightStyles(enabled) {
-    style.textContent = enabled ? `
-        .${NAME_CLASS} {
+    if (!enabled) {
+        style.textContent = '';
+        return;
+    }
+
+    // Dynamic class selection based on mode
+    const highlightClass = currentCopyMode === 'ticker' ? CLASSES.TICKER : CLASSES.NAME;
+
+    style.textContent = `
+        .${highlightClass} {
             background-color: #ffeb3b !important;
             transition: background-color 0.2s;
         }
-        .${NAME_CLASS}:hover {
+        .${highlightClass}:hover {
             background-color: #fdd835 !important;
             cursor: pointer;
         }
-    ` : '';
+    `;
 }
 
 // Initialize from storage
@@ -44,37 +54,81 @@ chrome.storage.local.get(['copyMode', 'highlightEnabled', 'autoPasteEnabled', 'a
     updateHighlightStyles(isHighlightEnabled);
 });
 
-// Listen for storage changes
+// Update storage listener to handle all settings changes
 chrome.storage.onChanged.addListener((changes) => {
     if (changes.copyMode) {
         currentCopyMode = changes.copyMode.newValue;
+        updateHighlightStyles(isHighlightEnabled);
     }
     if (changes.highlightEnabled) {
         isHighlightEnabled = changes.highlightEnabled.newValue;
         updateHighlightStyles(isHighlightEnabled);
     }
-    if (changes.autoPasteEnabled) {
-        isAutoPasteEnabled = changes.autoPasteEnabled.newValue;
-    }
     if (changes.autoCopyEnabled) {
         isAutoCopyEnabled = changes.autoCopyEnabled.newValue;
+        // Reset hover state when disabled
+        if (!isAutoCopyEnabled) {
+            lastHoveredText = '';
+            isPastingActive = false;
+        }
+    }
+    if (changes.autoPasteEnabled) {
+        isAutoPasteEnabled = changes.autoPasteEnabled.newValue;
+        // Reset paste state when disabled
+        if (!isAutoPasteEnabled) {
+            lastPastedText = '';
+            isPastingActive = false;
+            pasteAttempts = 0;
+            if (currentPasteTimeout) {
+                clearTimeout(currentPasteTimeout);
+            }
+        }
     }
 });
 
-// Optimized element text extraction
+// Update getElementText function to handle uppercase tickers
 function getElementText(element) {
-    if (!element) return null;
+    if (!element || !isAutoCopyEnabled) {
+        console.log('Debug: No element or auto-copy disabled');
+        return null;
+    }
 
-    const parent = element.classList.contains(PARENT_CLASS) ?
+    // Only use name element as entry point
+    const nameElement = element.classList.contains(CLASSES.NAME) ?
         element :
-        element.closest(`.${PARENT_CLASS}`);
+        element.closest(`.${CLASSES.NAME}`);
 
-    if (!parent) return null;
+    if (!nameElement) {
+        console.log('Debug: No name element found');
+        return null;
+    }
 
-    const targetClass = currentCopyMode === 'ticker' ? TICKER_CLASS : NAME_CLASS;
-    const targetElement = parent.querySelector(`.${targetClass}`);
+    // Find parent row that contains both name and ticker
+    const parent = nameElement.closest(`.${CLASSES.PARENT}`);
+    if (!parent) {
+        console.log('Debug: No parent row found');
+        return null;
+    }
 
-    return targetElement ? targetElement.textContent.trim() : null;
+    // For name mode - use name exactly as displayed
+    if (currentCopyMode === 'name') {
+        const text = nameElement.textContent;  // Remove trim() to preserve exact text
+        console.log('Debug: Name mode - found:', text);
+        return text;
+    }
+
+    // For ticker mode - find associated ticker and convert to uppercase
+    if (currentCopyMode === 'ticker') {
+        const tickerElement = parent.querySelector(`.${CLASSES.TICKER}`);
+        if (tickerElement) {
+            const text = tickerElement.textContent.trim().toUpperCase();
+            console.log('Debug: Ticker mode - found:', text);
+            return text;
+        }
+    }
+
+    console.log('Debug: No matching text found');
+    return null;
 }
 
 // Updated auto paste function
