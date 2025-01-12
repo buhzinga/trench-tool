@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Memescope Trench Tool",
   "version": "1.0",
-  "description": "Efficiently scan for copycat tokens",
+  "description": "Efficiently scan for copycats on Photon Memescope",
   "permissions": [
     "activeTab",
     "clipboardWrite",
