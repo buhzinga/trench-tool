@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Trench Tool",
+  "name": "Memescope Trench Tool",
   "version": "1.0",
-  "description": "Memescope Ticker/Name Copy",
+  "description": "Efficiently scan for copycat tokens",
   "permissions": [
     "activeTab",
     "clipboardWrite",
