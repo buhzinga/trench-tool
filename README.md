@@ -37,5 +37,9 @@ Made with Ai by Anthropic Claude 3.5 Sonnet.
   - Toggle auto-paste
   - Switch theme (dark/light)
 
+## Showcase
 <img width="211" alt="screenshot1" src="https://github.com/user-attachments/assets/0be8dcfe-325c-4349-ab40-a60b5e094fca" />
+
 <img width="212" alt="screenshot2" src="https://github.com/user-attachments/assets/0c3a1110-5131-41a7-9d44-804122c69b32" />
+
+https://github.com/user-attachments/assets/2efe75d1-cc55-44ae-b6be-639ea8429f3a
