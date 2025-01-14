@@ -36,7 +36,7 @@ TrenchTool is a browser extension for Photon Memescope that automates the token 
   - Switch theme (dark/light)
 
 ## Showcase
-https://github.com/user-attachments/assets/2efe75d1-cc55-44ae-b6be-639ea8429f3a
+https://github.com/user-attachments/assets/9e44cce4-1a2c-4314-bf03-5ad0e231fe9e
 
 <img width="211" alt="screenshot1" src="https://github.com/user-attachments/assets/0be8dcfe-325c-4349-ab40-a60b5e094fca" />
 
