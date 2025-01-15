@@ -17,7 +17,6 @@ This extension collects:
 - No analytics or tracking
 
 ## Permissions
-- activeTab: Required for reading token data
 - clipboardWrite: Required for copy functionality
 - storage: Required for saving user preferences
 
