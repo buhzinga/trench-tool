@@ -9,13 +9,16 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
+  "action": {
+    "default_icon": {
+      "32": "icons/icon32.png"
+    },
+    "default_popup": "popup.html"
+  },
   "permissions": [
     "clipboardWrite",
     "storage"
   ],
-  "action": {
-    "default_popup": "popup.html"
-  },
   "content_scripts": [
     {
       "matches": [
