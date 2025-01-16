@@ -35,6 +35,19 @@ TrenchTool is a browser extension for Photon Memescope that automates the token 
   - Toggle auto-paste
   - Switch theme (dark/light)
 
+## Development with Claude 3.5 Sonnet
+<img width="1274" alt="Image" src="https://github.com/user-attachments/assets/5c1bfaf8-57d1-4f85-8078-a4676bb348a7" />
+
+<img width="1278" alt="Image" src="https://github.com/user-attachments/assets/7614ad7b-23aa-42cc-a5bd-9db8773427b2" />
+
+<img width="1272" alt="Image" src="https://github.com/user-attachments/assets/e780d426-71f5-4fda-9bf9-56202b29b650" />
+
+<img width="1268" alt="Image" src="https://github.com/user-attachments/assets/e2f8ee6d-c147-41d5-af18-48e4d8d674db" />
+
+<img width="1275" alt="Image" src="https://github.com/user-attachments/assets/17667794-e136-498c-b779-edacc8bf7d72" />
+
+<img width="1275" alt="Image" src="https://github.com/user-attachments/assets/2283c8e7-39a1-49f4-b479-fc0fa3eaf622" />
+
 ## Showcase
 https://github.com/user-attachments/assets/9e44cce4-1a2c-4314-bf03-5ad0e231fe9e
 
