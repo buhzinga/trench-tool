@@ -273,4 +273,4 @@ function cleanup() {
 }
 
 // Listen for extension deactivation
-chrome.runtime.onSuspend.addListener(cleanup);
+window.addEventListener('unload', cleanup);
