@@ -48,6 +48,14 @@ body.dark-theme {
     height: 0;
 }
 
+/* Remove transitions from the base slider styles */
+.theme-switch .slider,
+.theme-switch .slider:before,
+.switch .slider,
+.switch .slider:before {
+    transition: none;
+}
+
 .theme-switch .slider {
     position: absolute;
     cursor: pointer;
@@ -78,22 +86,40 @@ body.dark-theme {
     transform: translateX(26px);
 }
 
+/* Sun and Moon Icons */
 .sun,
 .moon {
     width: 12px;
     height: 12px;
     position: absolute;
-    top: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    /* Remove opacity transition */
+    transition: none;
 }
 
 .sun {
     left: 6px;
     fill: #f39c12;
+    opacity: 0;
+    /* Hidden by default */
 }
 
 .moon {
     right: 6px;
     fill: #f1c40f;
+    opacity: 0;
+    /* Hidden by default */
+}
+
+/* Show sun in light mode */
+body:not(.dark-theme) .sun {
+    opacity: 1;
+}
+
+/* Show moon in dark mode */
+body.dark-theme .moon {
+    opacity: 1;
 }
 
 .section {
@@ -182,4 +208,12 @@ input:checked+.slider:before {
     display: flex;
     align-items: center;
     margin-top: 5px;
+}
+
+/* Enable transitions only after initialization */
+.initialized .theme-switch .slider,
+.initialized .theme-switch .slider:before,
+.initialized .switch .slider,
+.initialized .switch .slider:before {
+    transition: background-color 0.3s, transform 0.3s;
 }

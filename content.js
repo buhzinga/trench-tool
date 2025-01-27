@@ -1,4 +1,4 @@
-// Cache storage value
+// Cache storage values
 let currentCopyMode = 'ticker';
 let lastHoveredText = '';
 let lastPastedText = '';
@@ -10,29 +10,27 @@ let activeSearchInput = null;
 let pasteAttempts = 0;
 let currentPasteTimeout = null;
 let isPastingActive = false;
-const MAX_PASTE_ATTEMPTS = 5;
+const MAX_PASTE_ATTEMPTS = 3; // Reduced from 5 to 3 for faster retries
 
-// Update CLASSES constant (keep existing classes)
+// Constants for class names
 const CLASSES = {
     NAME: 'fsYi35goS5HvMls5HBGU',
     PARENT: 'U3jLlAVrk5kIsp1eeF9L',
     TICKER: 'siDxb5Gcy0nyxGjDtRQj',
 };
 
-// Create style element
+// Create and append style element
 const style = document.createElement('style');
 document.head.appendChild(style);
 
-// Update highlight styles function
+// Update highlight styles based on mode
 function updateHighlightStyles(enabled) {
     if (!enabled) {
         style.textContent = '';
         return;
     }
 
-    // Dynamic class selection based on mode
     const highlightClass = currentCopyMode === 'ticker' ? CLASSES.TICKER : CLASSES.NAME;
-
     style.textContent = `
         .${highlightClass} {
             background-color: #ffeb3b !important;
@@ -45,7 +43,7 @@ function updateHighlightStyles(enabled) {
     `;
 }
 
-// Initialize from storage
+// Initialize settings from storage
 chrome.storage.local.get(['copyMode', 'highlightEnabled', 'autoPasteEnabled', 'autoCopyEnabled'], (settings) => {
     currentCopyMode = settings.copyMode || 'ticker';
     isHighlightEnabled = settings.highlightEnabled || false;
@@ -54,139 +52,83 @@ chrome.storage.local.get(['copyMode', 'highlightEnabled', 'autoPasteEnabled', 'a
     updateHighlightStyles(isHighlightEnabled);
 });
 
-// Update storage listener to handle all settings changes
+// Listen for storage changes
 chrome.storage.onChanged.addListener((changes) => {
-    if (changes.copyMode) {
-        currentCopyMode = changes.copyMode.newValue;
-        updateHighlightStyles(isHighlightEnabled);
+    if (changes.copyMode) currentCopyMode = changes.copyMode.newValue;
+    if (changes.highlightEnabled) isHighlightEnabled = changes.highlightEnabled.newValue;
+    if (changes.autoCopyEnabled) isAutoCopyEnabled = changes.autoCopyEnabled.newValue;
+    if (changes.autoPasteEnabled) isAutoPasteEnabled = changes.autoPasteEnabled.newValue;
+
+    updateHighlightStyles(isHighlightEnabled);
+
+    if (!isAutoCopyEnabled) {
+        lastHoveredText = '';
+        isPastingActive = false;
     }
-    if (changes.highlightEnabled) {
-        isHighlightEnabled = changes.highlightEnabled.newValue;
-        updateHighlightStyles(isHighlightEnabled);
-    }
-    if (changes.autoCopyEnabled) {
-        isAutoCopyEnabled = changes.autoCopyEnabled.newValue;
-        // Reset hover state when disabled
-        if (!isAutoCopyEnabled) {
-            lastHoveredText = '';
-            isPastingActive = false;
-        }
-    }
-    if (changes.autoPasteEnabled) {
-        isAutoPasteEnabled = changes.autoPasteEnabled.newValue;
-        // Reset paste state when disabled
-        if (!isAutoPasteEnabled) {
-            lastPastedText = '';
-            isPastingActive = false;
-            pasteAttempts = 0;
-            if (currentPasteTimeout) {
-                clearTimeout(currentPasteTimeout);
-            }
-        }
+    if (!isAutoPasteEnabled) {
+        lastPastedText = '';
+        isPastingActive = false;
+        pasteAttempts = 0;
+        clearTimeout(currentPasteTimeout);
     }
 });
 
-// Update getElementText function to handle uppercase tickers
+// Get text from element based on mode
 function getElementText(element) {
-    if (!element || !isAutoCopyEnabled) {
-        console.log('Debug: No element or auto-copy disabled');
-        return null;
-    }
+    if (!element || !isAutoCopyEnabled) return null;
 
-    // Only use name element as entry point
-    const nameElement = element.classList.contains(CLASSES.NAME) ?
-        element :
-        element.closest(`.${CLASSES.NAME}`);
+    const nameElement = element.classList.contains(CLASSES.NAME) ? element : element.closest(`.${CLASSES.NAME}`);
+    if (!nameElement) return null;
 
-    if (!nameElement) {
-        console.log('Debug: No name element found');
-        return null;
-    }
-
-    // Find parent row that contains both name and ticker
     const parent = nameElement.closest(`.${CLASSES.PARENT}`);
-    if (!parent) {
-        console.log('Debug: No parent row found');
-        return null;
-    }
+    if (!parent) return null;
 
-    // For name mode - use name exactly as displayed
-    if (currentCopyMode === 'name') {
-        const text = nameElement.textContent;  // Remove trim() to preserve exact text
-        console.log('Debug: Name mode - found:', text);
-        return text;
-    }
+    if (currentCopyMode === 'name') return nameElement.textContent;
 
-    // For ticker mode - find associated ticker and convert to uppercase
     if (currentCopyMode === 'ticker') {
         const tickerElement = parent.querySelector(`.${CLASSES.TICKER}`);
-        if (tickerElement) {
-            const text = tickerElement.textContent.trim().toUpperCase();
-            console.log('Debug: Ticker mode - found:', text);
-            return text;
-        }
+        return tickerElement ? tickerElement.textContent.trim().toUpperCase() : null;
     }
 
-    console.log('Debug: No matching text found');
     return null;
 }
 
-// Updated auto paste function
+// Auto-paste text into search input
 function autoPasteIntoSearch(text) {
     if (!isAutoPasteEnabled || !text || !isPastingActive) return;
 
-    const searchSelectors = [
-        '.c-autocomplete__input.js-autocomplete',
-        'input.js-autocomplete',
-        '.js-autocomplete'
-    ];
-
-    let searchInput = null;
-    for (const selector of searchSelectors) {
-        searchInput = document.querySelector(selector);
-        if (searchInput) break;
-    }
-
+    const searchInput = document.querySelector('.c-autocomplete__input.js-autocomplete, input.js-autocomplete, .js-autocomplete');
     if (searchInput) {
         lastPastedText = text;
         searchInput.value = text;
 
-        const events = [
-            new Event('input', { bubbles: true }),
-            new Event('change', { bubbles: true }),
-            new KeyboardEvent('keyup', { key: 'Enter', bubbles: true }),
-            new KeyboardEvent('keydown', { key: 'Enter', bubbles: true })
-        ];
-
+        const events = ['input', 'change', 'keyup', 'keydown'].map(event =>
+            new KeyboardEvent(event, { key: 'Enter', bubbles: true })
+        );
         events.forEach(event => searchInput.dispatchEvent(event));
+
         searchInput.focus();
         searchInput.setSelectionRange(text.length, text.length);
-    } else {
+    } else if (pasteAttempts < MAX_PASTE_ATTEMPTS && isPastingActive) {
         pasteAttempts++;
-        if (pasteAttempts < MAX_PASTE_ATTEMPTS && isPastingActive) {
-            setTimeout(() => autoPasteIntoSearch(text), 200);
-        } else {
-            pasteAttempts = 0;
-        }
+        setTimeout(() => autoPasteIntoSearch(text), 100); // Reduced delay from 200ms to 100ms
+    } else {
+        pasteAttempts = 0;
     }
 }
 
-// Add mutation observer
+// Mutation observer for search input
 const observeSearchInput = new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-        if (mutation.addedNodes.length && lastPastedText && isPastingActive) {
-            autoPasteIntoSearch(lastPastedText);
-        }
+    if (lastPastedText && isPastingActive) {
+        mutations.forEach(mutation => {
+            if (mutation.addedNodes.length) autoPasteIntoSearch(lastPastedText);
+        });
     }
 });
 
-// Start observing the document
-observeSearchInput.observe(document.body, {
-    childList: true,
-    subtree: true
-});
+observeSearchInput.observe(document.body, { childList: true, subtree: true });
 
-// Create tooltip
+// Tooltip element
 const tooltip = document.createElement('div');
 tooltip.style.cssText = `
     position: fixed;
@@ -201,16 +143,7 @@ tooltip.style.cssText = `
 `;
 document.body.appendChild(tooltip);
 
-// Debounce function
-function debounce(func, wait) {
-    let timeout;
-    return function (...args) {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-}
-
-// Show tooltip function
+// Show tooltip
 function showTooltip(text, x, y) {
     tooltip.textContent = `Copied: ${text}`;
     tooltip.style.left = `${x + 10}px`;
@@ -219,9 +152,9 @@ function showTooltip(text, x, y) {
     setTimeout(() => tooltip.style.display = 'none', 1000);
 }
 
-// Handle mouse hover with debouncing
+// Debounced mouseover handler
 document.addEventListener('mouseover', debounce(async (e) => {
-    if (!isAutoCopyEnabled) return;  // Early return if auto-copy is OFF
+    if (!isAutoCopyEnabled) return;
 
     const text = getElementText(e.target);
     if (text && text !== lastHoveredText) {
@@ -232,22 +165,20 @@ document.addEventListener('mouseover', debounce(async (e) => {
             showTooltip(text, e.clientX, e.clientY);
 
             if (isAutoPasteEnabled) {
-                if (currentPasteTimeout) {
-                    clearTimeout(currentPasteTimeout);
-                }
+                clearTimeout(currentPasteTimeout);
                 pasteAttempts = 0;
                 isPastingActive = true;
                 autoPasteIntoSearch(text);
                 currentPasteTimeout = setTimeout(() => {
                     isPastingActive = false;
                     pasteAttempts = 0;
-                }, 5000);
+                }, 3000);
             }
         } catch (err) {
             console.error('Failed to copy text:', err);
         }
     }
-}, 50));
+}, 30)); // Reduced debounce delay from 50ms to 30ms
 
 // Track focused search input
 document.addEventListener('focusin', (e) => {
@@ -264,13 +195,17 @@ document.addEventListener('focusout', (e) => {
     }
 });
 
-// Cleanup function
-function cleanup() {
+// Cleanup on extension deactivation
+window.addEventListener('unload', () => {
     observeSearchInput.disconnect();
-    if (currentPasteTimeout) {
-        clearTimeout(currentPasteTimeout);
-    }
-}
+    clearTimeout(currentPasteTimeout);
+});
 
-// Listen for extension deactivation
-window.addEventListener('unload', cleanup);
+// Debounce utility
+function debounce(func, wait) {
+    let timeout;
+    return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func(...args), wait);
+    };
+}
