@@ -50,6 +50,31 @@ TrenchTool is a browser extension for Photon Memescope that automates the token 
 
 <img width="1275" alt="Image" src="https://github.com/user-attachments/assets/2283c8e7-39a1-49f4-b479-fc0fa3eaf622" />
 
+## Optimizations with DeepSeek
+<img width="1280" alt="Image" src="https://github.com/user-attachments/assets/b8020770-3273-4044-a2cf-b5ba0f4ad108" />
+
+<img width="1278" alt="Image" src="https://github.com/user-attachments/assets/f648d29d-14a3-4326-ae51-3801d11920ac" />
+
+<img width="1278" alt="Image" src="https://github.com/user-attachments/assets/6b0970b0-ae25-4541-8a8a-acbb371ee55f" />
+
+<img width="1272" alt="Image" src="https://github.com/user-attachments/assets/ab6e95bf-645d-4290-bdc4-b6d0c087acc4" />
+
+<img width="1280" alt="Image" src="https://github.com/user-attachments/assets/e74ba096-0ba7-49f1-9691-e4931ac4f887" />
+
+<img width="1277" alt="Image" src="https://github.com/user-attachments/assets/c1698007-b538-4089-9b93-edb73af1cb94" />
+
+<img width="1278" alt="Image" src="https://github.com/user-attachments/assets/de93367d-9cb7-4683-b994-4709ce194cdf" />
+
+<img width="1278" alt="Image" src="https://github.com/user-attachments/assets/6946afeb-1e11-48f9-838b-2990ea8a3567" />
+
+<img width="1280" alt="Image" src="https://github.com/user-attachments/assets/bd873135-ad24-4076-a25d-25d7fc13118e" />
+
+<img width="1280" alt="Image" src="https://github.com/user-attachments/assets/575d7ede-8013-4aec-9201-a89fb2a77d9e" />
+
+<img width="1280" alt="Image" src="https://github.com/user-attachments/assets/35f46888-c228-40a2-8104-f7f21f92940b" />
+
+<img width="1280" alt="Image" src="https://github.com/user-attachments/assets/53390b59-34d2-4643-a1df-91996feb9969" />
+
 ## Showcase
 https://github.com/user-attachments/assets/9e44cce4-1a2c-4314-bf03-5ad0e231fe9e
 
