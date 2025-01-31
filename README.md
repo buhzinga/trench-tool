@@ -2,7 +2,7 @@
 
 # What is TrenchTool?
 
-TrenchTool is a browser extension for Photon Memescope that automates the token search process through hover-based copy-paste actions. Initially built with Anthropic's Claude 3.5 Sonnet and further optimized using DeepSeek, it transforms manual letter-by-letter typing into a single hover action, helping trenchers quickly check for copycat tokens before risking capital.
+TrenchTool is a browser extension for Photon Memescope that automates the token search process through hover-based copy-paste actions. Entirely built with Anthropic's Claude 3.5 Sonnet and further optimized using DeepSeek, it transforms manual letter-by-letter typing into a single hover action, helping trenchers quickly check for copycat tokens before risking capital.
 
 ## Table of Contents
 - [What is TrenchTool?](#what-is-trenchtool)
