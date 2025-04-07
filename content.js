@@ -172,7 +172,7 @@ document.addEventListener('mouseover', debounce(async (e) => {
                 currentPasteTimeout = setTimeout(() => {
                     isPastingActive = false;
                     pasteAttempts = 0;
-                }, 1500);
+                }, 1250);
             }
         } catch (err) {
             console.error('Failed to copy text:', err);
